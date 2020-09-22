@@ -32,7 +32,6 @@ export default class LinkTooltip extends React.PureComponent<Props> {
 
     public constructor(props: Props) {
         super(props);
-
         this.tooltipContainerRef = React.createRef();
         this.show = false;
         this.showTimeout = -1;
@@ -44,26 +43,25 @@ export default class LinkTooltip extends React.PureComponent<Props> {
         window.clearTimeout(this.hideTimeout);
 
         if (!this.show) {
-            const $target: JQuery = $(e.target);
-            const target: Element = $target.get(0);
-            const $tooltipContainer: JQuery = $(this.tooltipContainerRef.current);
-            const tooltipContainer: Element = $tooltipContainer.get(0);
+            e.persist();
+            const tooltipContainer = this.tooltipContainerRef.current;
 
             //clear the old this.showTimeout if there is any before overriding
             window.clearTimeout(this.showTimeout);
 
             this.showTimeout = window.setTimeout(() => {
                 this.show = true;
-
-                $tooltipContainer.show(); // eslint-disable-line jquery/no-show
-                $tooltipContainer.children().on('mouseover', () => clearTimeout(this.hideTimeout));
-                $tooltipContainer.children().on('mouseleave', (event: JQueryEventObject) => {
-                    if (event.relatedTarget !== null) {
-                        this.hideTooltip();
-                    }
-                });
-
-                this.popper = new Popper(target, tooltipContainer, {
+                tooltipContainer.style.display = 'block';
+                const attachEvents = (el: HTMLElement) => {
+                    el.addEventListener('mouseover', () => clearTimeout(this.hideTimeout));
+                    el.addEventListener('mouseleave', (event: MouseEvent) => {
+                        if (event.relatedTarget !== null) {
+                            this.hideTooltip();
+                        }
+                    });
+                };
+                tooltipContainer.querySelectorAll('*').forEach(attachEvents);
+                this.popper = new Popper(e.target, tooltipContainer, {
                     placement: 'bottom',
                     modifiers: {
                         preventOverflow: {enabled: false},
@@ -83,12 +81,11 @@ export default class LinkTooltip extends React.PureComponent<Props> {
 
             //prevent executing the showTimeout after the hideTooltip
             clearTimeout(this.showTimeout);
-
-            $(this.tooltipContainerRef.current).hide(); // eslint-disable-line jquery/no-hide
+            this.tooltipContainerRef.current.style.display = 'none';
         }, Constants.OVERLAY_TIME_DELAY_SMALL);
     };
 
-    public render() {
+    public render = (): React.ReactNode => {
         const {href, children, attributes} = this.props;
 
         const dataAttributes = {

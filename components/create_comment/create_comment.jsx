@@ -2,7 +2,6 @@
 // See LICENSE.txt for license information.
 /* eslint-disable react/no-string-refs */
 
-import $ from 'jquery';
 import PropTypes from 'prop-types';
 import React from 'react';
 import classNames from 'classnames';
@@ -680,9 +679,9 @@ class CreateComment extends React.PureComponent {
     }
 
     scrollToBottom = () => {
-        const $el = $('.post-right__scroll');
-        if ($el[0]) {
-            $el.parent().scrollTop($el[0].scrollHeight); // eslint-disable-line jquery/no-parent
+        const el = document.querySelector('.post-right__scroll');
+        if (el) {
+            el.parentElement.scrollTop = el.parentElement.scrollHeight;
         }
     }
 

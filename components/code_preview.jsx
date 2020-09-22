@@ -1,7 +1,6 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 
-import $ from 'jquery';
 import PropTypes from 'prop-types';
 import React from 'react';
 
@@ -61,17 +60,13 @@ export default class CodePreview extends React.PureComponent {
         if (!this.state.lang || this.props.fileInfo.size > Constants.CODE_PREVIEW_MAX_FILE_SIZE) {
             return;
         }
-        $.ajax({ // eslint-disable-line jquery/no-ajax
-            async: true,
-            url: this.props.fileUrl,
-            type: 'GET',
-            dataType: 'text',
-            error: this.handleReceivedError,
-            success: this.handleReceivedCode,
-        });
+        fetch(this.props.fileUrl).
+            then((response) => response.text()).
+            then(this.handleReceivedCode).
+            catch(this.handleReceivedError);
     }
 
-    handleReceivedCode = (data) => {
+    handleReceivedCode = async (data) => {
         let code = data;
         if (data.nodeName === '#document') {
             code = new XMLSerializer().serializeToString(data);

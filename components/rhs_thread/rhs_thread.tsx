@@ -2,7 +2,6 @@
 // See LICENSE.txt for license information.
 /* eslint-disable react/no-string-refs */
 
-import $ from 'jquery';
 import React from 'react';
 import Scrollbars from 'react-custom-scrollbars';
 import {Posts} from 'mattermost-redux/constants';
@@ -207,8 +206,9 @@ export default class RhsThread extends React.Component<Props, State> {
     }
 
     public scrollToBottom = (): void => {
-        if ($('.post-right__scroll')[0]) {
-            $('.post-right__scroll').parent().scrollTop($('.post-right__scroll')[0].scrollHeight); // eslint-disable-line jquery/no-parent
+        const el = document.querySelector('.post-right__scroll');
+        if (el && el.parentElement) {
+            el.parentElement.scrollTop = el.parentElement.scrollHeight;
         }
     }
 
